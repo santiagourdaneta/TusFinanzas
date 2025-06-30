@@ -637,5 +637,5 @@ app.delete('/objetivos/:id', (req, res) => {
 // --- Iniciar el servidor ---
 app.listen(PORT, () => {
   console.log(`El Cerebro Servidor está escuchando en el puerto ${PORT}`);
-  console.log(`Puedes probarlo en tu navegador: http://localhost:${PORT}/gastos`);
+  console.log(`Puedes probarlo en tu navegador: https://tusfinanzas.onrender.com/gastos`);
 });
