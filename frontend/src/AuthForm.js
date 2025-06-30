@@ -29,7 +29,7 @@ function AuthForm({ onLoginSuccess }) {
       let respuesta;
       if (esModoRegistro) {
         // Modo Registro: Llama a la ruta POST /usuarios
-        respuesta = await axios.post('http://localhost:5000/usuarios', {
+        respuesta = await axios.post('https://tusfinanzas.onrender.com/usuarios', {
           nombre_usuario: nombreUsuario,
           contrasena: contrasena, // Recordatorio: en producción, esto se hashea en el backend
         });
@@ -37,7 +37,7 @@ function AuthForm({ onLoginSuccess }) {
         setEsModoRegistro(false); // Después de registrar, vamos al modo login
       } else {
         // Modo Login: Llama a la ruta POST /login
-        respuesta = await axios.post('http://localhost:5000/login', {
+        respuesta = await axios.post('https://tusfinanzas.onrender.com/login', {
           nombre_usuario: nombreUsuario,
           contrasena: contrasena,
         });
