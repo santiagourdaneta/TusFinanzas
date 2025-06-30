@@ -23,7 +23,7 @@ function Dashboard({ usuarioLogueado, manejarLogout }) {
     }
     try {
       console.log(`cargarCategorias (Dashboard): Fetching categories for userId: ${userId}`);
-      const respuesta = await axios.get(`http://localhost:5000/categorias/usuario/${userId}`);
+      const respuesta = await axios.get(`https://tusfinanzas.onrender.com/categorias/usuario/${userId}`);
       const data = respuesta.data;
       setCategorias(data);
       console.log('¡Categorías cargadas para usuario (Dashboard)!', userId, data);
