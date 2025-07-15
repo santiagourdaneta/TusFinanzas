@@ -127,7 +127,13 @@ const db = new sqlite3.Database('./finadvisor.db', (err) => {
 // --- RUTAS PARA GASTOS ---
 
     // Obtener gastos de un USUARIO específico (ahora también unimos con categorías)
-    app.get('/gastos/usuario/:usuario_id', (req, res) => {
+    const userExpensesLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // max 100 requests per windowMs
+      message: 'Demasiadas solicitudes al endpoint /gastos/usuario/:usuario_id, intente nuevamente más tarde.',
+    });
+
+    app.get('/gastos/usuario/:usuario_id', userExpensesLimiter, (req, res) => {
       const { usuario_id } = req.params;
       console.log(`Alguien pidió ver los gastos del usuario ID: ${usuario_id}`);
       // Unimos la tabla gastos con la tabla categorias para obtener el nombre de la categoría
