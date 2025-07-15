@@ -589,7 +589,13 @@ app.delete('/objetivos/:id', (req, res) => {
     });
 
     // Ruta para ACTUALIZAR una categoría
-    app.put('/categorias/:id', (req, res) => {
+    const updateCategoryLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // Limit each IP to 100 requests per windowMs
+      message: 'Too many update requests from this IP, please try again later.'
+    });
+
+    app.put('/categorias/:id', updateCategoryLimiter, (req, res) => {
       const { id } = req.params; // ID de la categoría a actualizar
       const { nombre, usuario_id } = req.body; // Nuevo nombre y usuario_id para verificación
 
