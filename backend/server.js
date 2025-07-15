@@ -2,6 +2,7 @@
 // Este es el primer archivo de tu "Cerebro Servidor"
 
 const express = require('express'); // Traemos la guía Express
+const rateLimit = require('express-rate-limit'); // Middleware de limitación de tasa
 const cors = require('cors');       // Traemos el permiso de comunicación
 const sqlite3 = require('sqlite3').verbose(); // Traemos la herramienta para SQLite
 const bcrypt = require('bcryptjs'); // Importamos la librería para encriptar contraseñas
@@ -617,7 +618,14 @@ app.delete('/objetivos/:id', (req, res) => {
     });
 
     // 3. Ruta para ELIMINAR una categoría
-    app.delete('/categorias/:id', (req, res) => {
+    const rateLimit = require('express-rate-limit');
+    const deleteCategoryLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // Limit each IP to 100 requests per windowMs
+      message: 'Too many delete requests from this IP, please try again later.'
+    });
+
+    app.delete('/categorias/:id', deleteCategoryLimiter, (req, res) => {
       const { id } = req.params;
       db.run(`DELETE FROM categorias WHERE id = ?`, id, function(err) {
         if (err) {
