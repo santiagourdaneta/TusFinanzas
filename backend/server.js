@@ -224,7 +224,7 @@ const db = new sqlite3.Database('./finadvisor.db', (err) => {
               return;
             }
             if (row) {
-              console.log(`Gasto con ID ${id} actualizado y recuperado de la caja fuerte.`, row);
+              console.log('Gasto con ID %s actualizado y recuperado de la caja fuerte.', id, row);
               res.status(200).json(row);
             } else {
               res.status(404).json({ message: 'Gasto actualizado, pero no encontrado después de recuperar.' });
