@@ -161,7 +161,13 @@ const db = new sqlite3.Database('./finadvisor.db', (err) => {
     });
 
     // Crear un nuevo gasto (¡RECIBE Y GUARDA EL CATEGORIA_ID!)
-    app.post('/gastos', (req, res) => {
+    const createExpenseLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutos
+      max: 100, // máximo 100 solicitudes por ventana
+      message: 'Demasiadas solicitudes al endpoint para crear gastos, intente nuevamente más tarde.',
+    });
+
+    app.post('/gastos', createExpenseLimiter, (req, res) => {
       const { descripcion, monto, usuario_id, categoria_id } = req.body; // <-- Recibe categoria_id
       const id = Date.now().toString();
       const fecha = new Date().toISOString();
