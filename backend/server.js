@@ -434,7 +434,13 @@ app.post('/ingresos', ingresosLimiter, (req, res) => {
 });
 
 // Obtener ingresos de un USUARIO específico
-app.get('/ingresos/usuario/:usuario_id', (req, res) => {
+const usuarioIngresosLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000, // 30 minutos
+  max: 50, // máximo 50 solicitudes por ventana por IP
+  message: { error: "Demasiadas solicitudes para obtener ingresos de usuario desde esta IP, por favor intente más tarde." }
+});
+
+app.get('/ingresos/usuario/:usuario_id', usuarioIngresosLimiter, (req, res) => {
   const { usuario_id } = req.params;
   db.all(`SELECT * FROM ingresos WHERE usuario_id = ? ORDER BY fecha DESC`, usuario_id, (err, rows) => {
     if (err) {
