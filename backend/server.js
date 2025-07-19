@@ -188,7 +188,14 @@ const db = new sqlite3.Database('./finadvisor.db', (err) => {
     });
 
     // Actualizar un gasto (¡ACTUALIZA EL CATEGORIA_ID!)
-    app.put('/gastos/:id', (req, res) => {
+    // Rate limiter para actualizar gasto
+    const updateExpenseLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutos
+      max: 100, // máximo 100 solicitudes por ventana
+      message: 'Demasiadas solicitudes al endpoint para actualizar gastos, intente nuevamente más tarde.',
+    });
+
+    app.put('/gastos/:id', updateExpenseLimiter, (req, res) => {
       const { id } = req.params;
       const { descripcion, monto, categoria_id } = req.body; // <-- Recibe categoria_id para actualizar
 
