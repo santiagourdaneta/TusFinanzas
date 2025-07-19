@@ -354,7 +354,13 @@ app.get('/usuarios', (req, res) => {
 });
 
 // --- RUTA CLAVE: INICIAR SESIÓN (LOGIN) ---
-app.post('/login', (req, res) => {
+const loginLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 10, // Limit each IP to 10 login requests per `window` (here, per minute)
+  message: { error: 'Demasiados intentos de inicio de sesión. Por favor, inténtelo de nuevo más tarde.' },
+});
+
+app.post('/login', loginLimiter, (req, res) => {
   const { nombre_usuario, contrasena } = req.body;
 
   if (!nombre_usuario || !contrasena) {
