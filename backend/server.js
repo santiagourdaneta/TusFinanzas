@@ -542,7 +542,12 @@ app.put('/objetivos/:id', (req, res) => {
 });
 
 // Eliminar un objetivo
-app.delete('/objetivos/:id', (req, res) => {
+const deleteRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 delete requests per windowMs
+});
+
+app.delete('/objetivos/:id', deleteRateLimiter, (req, res) => {
   const { id } = req.params;
   db.run(`DELETE FROM objetivos WHERE id = ?`, id, function(err) {
     if (err) {
