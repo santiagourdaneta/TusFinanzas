@@ -583,7 +583,13 @@ app.delete('/objetivos/:id', (req, res) => {
     });
 
     // 2. Ruta para OBTENER categorías de un USUARIO específico
-    app.get('/categorias/usuario/:usuario_id', (req, res) => {
+    const getCategoryLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // Limit each IP to 100 requests per windowMs
+      message: 'Too many requests to fetch categories from this IP, please try again later.'
+    });
+
+    app.get('/categorias/usuario/:usuario_id', getCategoryLimiter, (req, res) => {
       const { usuario_id } = req.params;
       db.all(`SELECT * FROM categorias WHERE usuario_id = ? ORDER BY nombre ASC`, [usuario_id], (err, rows) => {
         if (err) {
