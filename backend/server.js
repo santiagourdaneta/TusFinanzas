@@ -11,6 +11,12 @@ const bcrypt = require('bcryptjs'); // Importamos la librería para encriptar co
 const app = express(); // Creamos una nueva "aplicación" de Express
 const PORT = 5000;     // Elegimos un "puerto" (como un número de teléfono) para que la gente nos llame
 
+// Limitador de tasa para la creación de ingresos (máximo 20 por hora por IP)
+const ingresosLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 20, // máximo 20 solicitudes por ventana por IP
+  message: { error: "Demasiadas solicitudes de creación de ingresos desde esta IP, por favor intente más tarde." }
+});
 // Le decimos a Express que use el permiso de comunicación (CORS)
 app.use(cors());
 // Le decimos a Express que entienda mensajes en formato JSON (como las tarjetitas de gasto)
@@ -405,7 +411,7 @@ app.post('/login', loginLimiter, (req, res) => {
 // --- RUTAS PARA INGRESOS ---
 
 // Crear un nuevo ingreso
-app.post('/ingresos', (req, res) => {
+app.post('/ingresos', ingresosLimiter, (req, res) => {
   const { usuario_id, descripcion, monto } = req.body;
   const id = Date.now().toString();
   const fecha = new Date().toISOString();
