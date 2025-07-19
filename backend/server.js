@@ -249,7 +249,12 @@ const db = new sqlite3.Database('./finadvisor.db', (err) => {
 
 
 // Eliminar un gasto
-app.delete('/gastos/:id', (req, res) => {
+const deleteExpenseLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 delete requests per windowMs
+  message: 'Demasiadas solicitudes para eliminar gastos desde esta IP, por favor intente nuevamente más tarde.'
+});
+app.delete('/gastos/:id', deleteExpenseLimiter, (req, res) => {
   const { id } = req.params;
   db.run(`DELETE FROM gastos WHERE id = ?`, id, function(err) {
     if (err) {
