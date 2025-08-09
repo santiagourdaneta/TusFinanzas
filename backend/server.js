@@ -287,8 +287,15 @@ app.delete('/gastos/:id', deleteExpenseLimiter, (req, res) => {
 
 // --- RUTAS PARA USUARIOS ---
 
+// Limitador de tasa para la creación de usuarios (máximo 10 por hora por IP)
+const usuariosLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 10, // máximo 10 solicitudes por ventana por IP
+  message: { error: "Demasiadas solicitudes de creación de usuario desde esta IP, por favor intente más tarde." }
+});
+
 // Ruta para CREAR un nuevo usuario (Registro)
-app.post('/usuarios', (req, res) => {
+app.post('/usuarios', usuariosLimiter, (req, res) => {
   const { nombre_usuario, contrasena } = req.body;
 
   if (!nombre_usuario || !contrasena) {
