@@ -547,7 +547,12 @@ app.get('/objetivos/usuario/:usuario_id', (req, res) => {
 });
 
 // Actualizar un objetivo
-app.put('/objetivos/:id', (req, res) => {
+const updateRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 update requests per windowMs
+});
+
+app.put('/objetivos/:id', updateRateLimiter, (req, res) => {
   const { id } = req.params;
   const { nombre, monto_meta, monto_actual, fecha_limite, completado } = req.body;
 
