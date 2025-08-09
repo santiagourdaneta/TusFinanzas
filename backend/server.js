@@ -526,7 +526,14 @@ app.post('/objetivos', (req, res) => {
 });
 
 // Obtener objetivos de un USUARIO específico
-app.get('/objetivos/usuario/:usuario_id', (req, res) => {
+// Limitador de tasa para obtener objetivos de usuario (máximo 100 por 15 minutos por IP)
+const getObjetivosLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { error: "Demasiadas solicitudes para obtener objetivos desde esta IP, por favor intente más tarde." }
+});
+
+app.get('/objetivos/usuario/:usuario_id', getObjetivosLimiter, (req, res) => {
   const { usuario_id } = req.params;
   db.all(`SELECT * FROM objetivos WHERE usuario_id = ? ORDER BY id DESC`, usuario_id, (err, rows) => {
     if (err) {
