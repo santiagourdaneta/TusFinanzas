@@ -509,8 +509,15 @@ app.delete('/ingresos/:id', (req, res) => {
 
 // --- RUTAS PARA OBJETIVOS ---
 
+// Limitador de tasa para la creación de objetivos (máximo 20 por hora por IP)
+const nuevoObjetivoLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 20, // máximo 20 solicitudes por ventana por IP
+  message: { error: "Demasiadas solicitudes de creación de objetivos desde esta IP, por favor intente más tarde." }
+});
+
 // Crear un nuevo objetivo
-app.post('/objetivos', (req, res) => {
+app.post('/objetivos', nuevoObjetivoLimiter, (req, res) => {
   const { usuario_id, nombre, monto_meta, monto_actual = 0, fecha_limite } = req.body;
   const id = Date.now().toString();
   const completado = 0;
