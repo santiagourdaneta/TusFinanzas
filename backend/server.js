@@ -458,8 +458,15 @@ app.get('/ingresos/usuario/:usuario_id', usuarioIngresosLimiter, (req, res) => {
   });
 });
 
+// Limitador de tasa para actualizar ingresos (máximo 20 por hora por IP)
+const actualizarIngresoLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 20, // máximo 20 solicitudes por ventana por IP
+  message: { error: "Demasiadas solicitudes de actualización de ingresos desde esta IP, por favor intente más tarde." }
+});
+
 // Actualizar un ingreso
-app.put('/ingresos/:id', (req, res) => {
+app.put('/ingresos/:id', actualizarIngresoLimiter, (req, res) => {
   const { id } = req.params;
   const { descripcion, monto } = req.body;
 
