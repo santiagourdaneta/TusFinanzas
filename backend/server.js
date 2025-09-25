@@ -490,7 +490,13 @@ app.put('/ingresos/:id', (req, res) => {
 });
 
 // Eliminar un ingreso
-app.delete('/ingresos/:id', (req, res) => {
+const eliminarIngresoLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 10, // máximo 10 eliminaciones por hora por IP
+  message: 'Has excedido el límite de eliminaciones de ingresos por hora.',
+});
+
+app.delete('/ingresos/:id', eliminarIngresoLimiter, (req, res) => {
   const { id } = req.params;
   db.run(`DELETE FROM ingresos WHERE id = ?`, id, function(err) {
     if (err) {
