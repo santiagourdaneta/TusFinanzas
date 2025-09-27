@@ -294,6 +294,13 @@ const usuariosLimiter = rateLimit({
   message: { error: "Demasiadas solicitudes de creación de usuario desde esta IP, por favor intente más tarde." }
 });
 
+// Limitador de tasa para obtener usuarios (máximo 30 por hora por IP)
+const usuariosGetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 30, // máximo 30 solicitudes por ventana por IP
+  message: { error: "Demasiadas solicitudes para obtener usuarios desde esta IP, por favor intente más tarde." }
+});
+
 // Ruta para CREAR un nuevo usuario (Registro)
 app.post('/usuarios', usuariosLimiter, (req, res) => {
   const { nombre_usuario, contrasena } = req.body;
@@ -356,7 +363,7 @@ app.post('/usuarios', usuariosLimiter, (req, res) => {
 });
 
 // Ruta para OBTENER todos los usuarios (¡Solo para pruebas, no para producción!)
-app.get('/usuarios', (req, res) => {
+app.get('/usuarios', usuariosGetLimiter, (req, res) => {
   db.all(`SELECT id, nombre_usuario, fecha_registro FROM usuarios`, [], (err, rows) => {
     if (err) {
       console.error('Error al obtener usuarios:', err.message);
